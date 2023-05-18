@@ -1,38 +1,46 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+This is a very basic example of how to make a ChatGPT plugin which supports oauth authentication so users can access their data from your application in ChatGPT.
+
+## ⚠️ IMPORTANT ⚠️
+This is just a very simple example to allow quick prototyping. You would never want to use this in production. For that, you'd probably want to use a secure and maintained [library](https://github.com/panva/node-oidc-provider) to handle the oauth flow.
 
 ## Getting Started
 
-First, run the development server:
+You need ChatGPT developer access to deploy plugins.
 
-```bash
+First install dependencies and initialize the local database:
+```
+npm i
+npx prisma migrate dev --name init
+```
+For authenticated plugins, OpenAI needs to communicate with your server during the login flow. You need to use a tunnel like [Cloudflare](https://developers.cloudflare.com/pages/how-to/preview-with-cloudflare-tunnel/) or [ngrok](https://ngrok.com/).
+
+Set the `HOST` and `NEXTAUTH_URL` variables in the sample .env file to your tunnel URL.
+
+Start the server:
+```
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Go to [ChatGPT](https://chat.openai.com/) and select the plugin model. 
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+Then click on the plugin library and click `Plugin store`.
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+Click on `Develop your own plugin` at the bottom.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+Enter your tunnel URL.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Then enter the client id and secret from the .env file:
 
-## Learn More
+![Screenshot 2023-05-18 at 2 51 43 PM](https://github.com/etown/chatgpt-plugin-oauth-example/assets/357244/2871b5f7-7adc-4ebd-8279-ca22f5759736)
 
-To learn more about Next.js, take a look at the following resources:
+Then take the verification token and add it to the .env in `VERIFICATION_TOKEN` and save.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+![Screenshot 2023-05-18 at 2 56 53 PM](https://github.com/etown/chatgpt-plugin-oauth-example/assets/357244/b95ca00b-8df3-4e77-bf6b-76ab23219d16)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Click `Install for me` and `Login`.
 
-## Deploy on Vercel
+You will be redirected to the NextAuth credentials login page. Enter any username and password. You are then redirected back to ChatGPT and your plugin is now enabled and authenticated!
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+You can then ask 'What is my username?' in it will invoke the `/api/chatgpt/username.js` route. The authenticated user is retrieved from the bearer token and the username is returned.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+![Screenshot 2023-05-18 at 3 05 09 PM](https://github.com/etown/chatgpt-plugin-oauth-example/assets/357244/b095fb65-bc65-4cbe-a4b8-e00eb57e2a7a)
